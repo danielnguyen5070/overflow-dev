@@ -50,8 +50,8 @@ body {
 
   --screen-xs: 420px;
 
-  --font-family-inter: var(--font-inter);
-  --font-family-space-grotesk: var(--font-space-grotesk);
+  --font-inter: var(--font-inter);
+  --font-space-grotesk: var(--font-space-grotesk);
 
   --radius-2: 8px;
   --radius-1.5: 6px;
