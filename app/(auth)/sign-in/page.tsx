@@ -1,14 +1,27 @@
 "use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import React from "react";
+import { toast } from "sonner";
+import ROUTES from "@/constants/routes";
+import { signIn } from "next-auth/react";
 
 const SignIn = () => {
   const buttonClass =
     "background-dark400_light900 body-medium text-dark200_light800 min-h-12 flex-1 rounded-2 px-4 py-3.5";
 
-  const handleSignIn = (provider: string) => {
-    console.log(provider);
+  const handleSignIn = async (provider: "github" | "google") => {
+    try {
+      debugger;
+      await signIn(provider, {
+        callbackUrl: ROUTES.HOME,
+        redirect: false,
+      });
+    } catch (error) {
+      toast("Event has been created.");
+      console.error(error);
+    }
   };
 
   return (
