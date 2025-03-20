@@ -1,3 +1,4 @@
+import QuestionCard from "@/components/cards/QuestionCard";
 import HomeFilter from "@/components/search/HomeFilter";
 import LocalSearch from "@/components/search/LocalSearch";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,50 @@ import ROUTES from "@/constants/routes";
 import { Link } from "lucide-react";
 import React from "react";
 
+const questions = [
+  {
+    _id: "1",
+    title: "How to use Next.js?",
+    content: "I am new to Next.js and I want to learn how to use it.",
+    tags: [
+      {
+        _id: "1",
+        name: "Next.js",
+      },
+    ],
+    author: {
+      _id: "1",
+      name: "John Doe",
+      image: "https://randomuser.me/api/portraits/lego/1.jpg",
+    },
+    createdAt: new Date(),
+    upvotes: 10,
+    downvotes: 5,
+    answers: 3,
+    views: 100,
+  },
+  {
+    _id: "2",
+    title: "How to use Next.js?",
+    content: "I am new to Next.js and I want to learn how to use it.",
+    tags: [
+      {
+        _id: "1",
+        name: "Next.js",
+      },
+    ],
+    author: {
+      _id: "1",
+      name: "John Doe",
+      image: "https://randomuser.me/api/portraits/lego/1.jpg",
+    },
+    createdAt: new Date(),
+    upvotes: 10,
+    downvotes: 5,
+    answers: 3,
+    views: 100,
+  },
+];
 const Home = () => {
   return (
     <>
@@ -27,6 +72,12 @@ const Home = () => {
         />
       </section>
       <HomeFilter />
+
+      <div className="mt-10 flex w-full flex-col gap-6">
+        {questions.map((question) => (
+          <QuestionCard key={question._id} question={question} />
+        ))}
+      </div>
     </>
   );
 };
