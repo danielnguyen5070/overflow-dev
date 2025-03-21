@@ -3,7 +3,7 @@ import HomeFilter from "@/components/search/HomeFilter";
 import LocalSearch from "@/components/search/LocalSearch";
 import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
-import { Link } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 const questions = [
