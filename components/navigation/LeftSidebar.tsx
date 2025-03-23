@@ -30,6 +30,7 @@ const LeftSidebar = async () => {
           >
             <Button
               type="submit"
+              variant="ghost"
               className="base-medium w-fit !bg-transparent px-4 py-3"
             >
               <LogOut className="size-5 text-black dark:text-white" />

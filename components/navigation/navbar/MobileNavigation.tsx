@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { auth, signOut } from "@/auth";
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetClose,
@@ -12,7 +11,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import ROUTES from "@/constants/routes";
+
 import NavLinks from "./NavLinks";
+import { Button } from "../../ui/button";
 
 const MobileNavigation = async () => {
   const session = await auth();
@@ -31,14 +32,14 @@ const MobileNavigation = async () => {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="background-light900_dark200 border-none px-4"
+        className="background-light900_dark200 border-none px-6"
       >
         <SheetTitle className="hidden">Navigation</SheetTitle>
-        <Link href="/" className="flex items-center gap-1 h-14">
+        <Link href="/" className="flex items-center gap-1 mt-2">
           <Image
             src="/images/site-logo.svg"
-            width={24}
-            height={24}
+            width={23}
+            height={23}
             alt="Logo"
           />
 
@@ -66,6 +67,7 @@ const MobileNavigation = async () => {
                 >
                   <Button
                     type="submit"
+                    variant="ghost"
                     className="base-medium w-fit !bg-transparent px-4 py-3"
                   >
                     <LogOut className="size-5 text-black dark:text-white" />
