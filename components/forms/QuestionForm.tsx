@@ -1,37 +1,46 @@
 "use client";
 
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { MDXEditorMethods } from "@mdxeditor/editor";
-import React, { useRef } from "react";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import React, { useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import ROUTES from "@/constants/routes";
+import { createQuestion, editQuestion } from "@/lib/actions/question.action";
+import { AskQuestionSchema } from "@/lib/validations";
+
 import TagCard from "../cards/TagCard";
 import { Button } from "../ui/button";
 import {
   Form,
+  FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
-  FormDescription,
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { AskQuestionSchema } from "@/lib/validations";
-import dynamic from "next/dynamic";
+import { toast } from "sonner";
+
+const Editor = dynamic(() => import("@/components/editor"), {
+  ssr: false,
+});
 
 interface Params {
   question?: Question;
   isEdit?: boolean;
 }
 
-const Editor = dynamic(() => import("@/components/editor"), {
-  ssr: false,
-});
-
 const QuestionForm = ({ question, isEdit = false }: Params) => {
+  const router = useRouter();
   const editorRef = useRef<MDXEditorMethods>(null);
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<z.infer<typeof AskQuestionSchema>>({
     resolver: zodResolver(AskQuestionSchema),
     defaultValues: {
@@ -40,11 +49,6 @@ const QuestionForm = ({ question, isEdit = false }: Params) => {
       tags: question?.tags.map((tag) => tag.name) || [],
     },
   });
-  const handleCreateQuestion = async (
-    data: z.infer<typeof AskQuestionSchema>
-  ) => {
-    console.log(data);
-  };
 
   const handleInputKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
@@ -86,7 +90,40 @@ const QuestionForm = ({ question, isEdit = false }: Params) => {
     }
   };
 
-  const isPending = false;
+  const handleCreateQuestion = async (
+    data: z.infer<typeof AskQuestionSchema>
+  ) => {
+    startTransition(async () => {
+      if (isEdit && question) {
+        const result = await editQuestion({
+          questionId: question?._id,
+          ...data,
+        });
+
+        if (result.success) {
+          toast("Question updated successfully");
+
+          if (result.data && typeof result.data._id === "string") {
+            router.push(ROUTES.QUESTION(result.data._id));
+          }
+        } else {
+          toast(result.error?.message || "Something went wrong");
+        }
+
+        return;
+      }
+
+      const result = await createQuestion(data);
+
+      if (result.success) {
+        toast("Question created successfully");
+
+        if (result.data) router.push(ROUTES.QUESTION(result.data._id));
+      } else {
+        toast(result.error?.message || "Something went wrong");
+      }
+    });
+  };
 
   return (
     <Form {...form}>
