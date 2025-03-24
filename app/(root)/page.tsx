@@ -1,56 +1,37 @@
 import QuestionCard from "@/components/cards/QuestionCard";
+import DataRenderer from "@/components/DataRenderer";
 import HomeFilter from "@/components/search/HomeFilter";
 import LocalSearch from "@/components/search/LocalSearch";
 import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
+import { EMPTY_QUESTION } from "@/constants/states";
+import { getQuestions } from "@/lib/actions/question.action";
 import Link from "next/link";
 import React from "react";
 
-const questions = [
-  {
-    _id: "1",
-    title: "How to use Next.js?",
-    content: "I am new to Next.js and I want to learn how to use it.",
-    tags: [
-      {
-        _id: "1",
-        name: "Next.js",
-      },
-    ],
-    author: {
-      _id: "1",
-      name: "John Doe",
-      image: "https://randomuser.me/api/portraits/lego/1.jpg",
-    },
-    createdAt: new Date(),
-    upvotes: 10,
-    downvotes: 5,
-    answers: 3,
-    views: 100,
-  },
-  {
-    _id: "2",
-    title: "How to use Next.js?",
-    content: "I am new to Next.js and I want to learn how to use it.",
-    tags: [
-      {
-        _id: "1",
-        name: "Next.js",
-      },
-    ],
-    author: {
-      _id: "1",
-      name: "John Doe",
-      image: "https://randomuser.me/api/portraits/lego/1.jpg",
-    },
-    createdAt: new Date(),
-    upvotes: 10,
-    downvotes: 5,
-    answers: 3,
-    views: 100,
-  },
-];
-const Home = () => {
+interface SearchParams {
+  searchParams: Promise<{ [key: string]: string }>;
+}
+
+/**
+ * The `Home` component renders the main page displaying all questions.
+ * It includes a header section with a title and a button linking to the "Ask a Question" page.
+ * Below the header, it integrates a local search component for searching questions,
+ * a filter component, and a data renderer that displays a list of questions using `QuestionCard`.
+ */
+
+const Home = async ({ searchParams }: SearchParams) => {
+  const { page, pageSize, query, filter } = await searchParams;
+
+  const { success, data, error } = await getQuestions({
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 10,
+    query: query || "",
+    filter: filter || "",
+  });
+
+  const { questions } = data || {};
+
   return (
     <>
       <section className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
@@ -73,11 +54,19 @@ const Home = () => {
       </section>
       <HomeFilter />
 
-      <div className="mt-10 flex w-full flex-col gap-6">
-        {questions.map((question) => (
-          <QuestionCard key={question._id} question={question} />
-        ))}
-      </div>
+      <DataRenderer
+        success={success}
+        error={error}
+        data={questions}
+        empty={EMPTY_QUESTION}
+        render={(questions) => (
+          <div className="mt-10 flex w-full flex-col gap-6">
+            {questions.map((question) => (
+              <QuestionCard key={question._id} question={question} />
+            ))}
+          </div>
+        )}
+      />
     </>
   );
 };
