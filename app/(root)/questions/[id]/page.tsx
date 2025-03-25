@@ -13,6 +13,13 @@ import ROUTES from "@/constants/routes";
 import { getQuestion, incrementViews } from "@/lib/actions/question.action";
 //import { hasVoted } from "@/lib/actions/vote.action";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
+import AllAnswers from "@/components/answers/AllAnswers";
+import { hasVoted } from "@/lib/actions/vote.action";
+import { getAnswers } from "@/lib/actions/answer.action";
+import AnswerForm from "@/components/cards/AnswerForm";
+import Votes from "@/components/votes/Votes";
+import { hasSavedQuestion } from "@/lib/actions/collection.action";
+import SaveQuestion from "@/components/questions/SaveQuestion";
 
 const QuestionDetails = async ({ params }: RouteParams) => {
   const { id } = await params;
@@ -24,14 +31,25 @@ const QuestionDetails = async ({ params }: RouteParams) => {
 
   if (!success || !question) return redirect("/404");
 
-  // const hasVotedPromise = hasVoted({
-  //   targetId: question._id,
-  //   targetType: "question",
-  // });
+  const {
+    success: areAnswersLoaded,
+    data: answersResult,
+    error: answersError,
+  } = await getAnswers({
+    questionId: id,
+    page: 1,
+    pageSize: 10,
+    filter: "latest",
+  });
 
-  // const hasSavedQuestionPromise = hasSavedQuestion({
-  //   questionId: question._id,
-  // });
+  const hasVotedPromise = hasVoted({
+    targetId: question._id,
+    targetType: "question",
+  });
+
+  const hasSavedQuestionPromise = hasSavedQuestion({
+    questionId: question._id,
+  });
 
   const { author, createdAt, answers, views, tags, content, title } = question;
 
@@ -54,7 +72,7 @@ const QuestionDetails = async ({ params }: RouteParams) => {
           </div>
 
           <div className="flex items-center justify-end gap-4">
-            {/* <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div>Loading...</div>}>
               <Votes
                 targetType="question"
                 upvotes={question.upvotes}
@@ -62,13 +80,13 @@ const QuestionDetails = async ({ params }: RouteParams) => {
                 targetId={question._id}
                 hasVotedPromise={hasVotedPromise}
               />
-            </Suspense> */}
+            </Suspense>
 
             <Suspense fallback={<div>Loading...</div>}>
-              {/* <SaveQuestion
+              <SaveQuestion
                 questionId={question._id}
                 hasSavedQuestionPromise={hasSavedQuestionPromise}
-              /> */}
+              />
             </Suspense>
           </div>
         </div>
@@ -114,6 +132,23 @@ const QuestionDetails = async ({ params }: RouteParams) => {
           />
         ))}
       </div>
+
+      <section className="my-5">
+        <AllAnswers
+          data={answersResult?.answers}
+          success={areAnswersLoaded}
+          error={answersError}
+          totalAnswers={answersResult?.totalAnswers || 0}
+        />
+      </section>
+
+      <section className="my-5">
+        <AnswerForm
+          questionId={question._id}
+          questionTitle={question.title}
+          questionContent={question.content}
+        />
+      </section>
     </>
   );
 };
